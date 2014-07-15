@@ -20,6 +20,9 @@
 (->str \s)
 (->str :j)
 
+(= (->str 'j) (->str \j) (->str :j) (->str "j"))
+(= (->str 'mob) (->str :mob) (->str "mob"))
+
 (defn dashify [lst]
   "list -> string (with dashes in place of spaces)"
   (->> lst (interleave (repeat \-)) rest (apply str)))
@@ -37,18 +40,18 @@
 (macroexpand (getter-example-1 prop))
 
 (defmacro getter-example-2 [p]
-  `(defn ~(sym-key-prop :get `(~p)) [] ~p))
+  `(defn ~(sym-key-prop :get (eval p)) [] ~p))
 
 (macroexpand '(getter-example-2 prop))
 
 (getter-example-2 prop)
 (getter-example-2 :some-property)
 
-(defmacro fn-er [prop prefix]
+(defmacro fn-er [prefix prop]
   `(list 'defn (sym-key-prop ~prefix ~prop) [] ~prop))
 
 (defmacro getter [prop]
-  (fn-er prop :get))
+  `(fn-er :get ~prop))
 ;; Bah hahahahaha! you can offset the evaluation of the defn, thereby
 ;; ignoring its whole "oh, I need a symbol as my first argument ah-derp"
 ;; situation.
@@ -72,7 +75,7 @@
 (getter (first default-props))
 (get-id)
 
-(map eval (map #(getter %) default-props))
+(map #(getter %) default-props)
 
 (get-breed)
 
