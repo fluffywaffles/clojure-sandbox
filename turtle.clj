@@ -10,7 +10,7 @@
 
 (defn keyword->str
   "keyword->string, dropping the leading :"
-  [k] (->> k str rest (reduce str)))
+  [k] (->> k str rest (apply str)))
 
 (defn dashify [lst]
   "list -> string (with dashes in place of spaces)"
@@ -38,8 +38,13 @@
 
 (defmacro kw-getter [prop]
   `(list 'defn (sym-key-prop :get ~prop) [] ~prop))
+;; Bah hahahahaha! you can offset the evaluation of the defn, thereby
+;; ignoring its whole "oh, I need a symbol as my first argument ah-derp"
+;; situation.
 
-(eval (kw-getter prop))
+;; now for a setter...
+
+((eval (kw-getter prop)))
 
 (kw-getter :potato)
 (kw-getter :id)
