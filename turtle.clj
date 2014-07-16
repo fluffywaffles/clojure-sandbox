@@ -75,7 +75,7 @@
 (getter (first default-props))
 (get-id)
 
-(map #(getter %) default-props)
+(map #(-> % getter eval) default-props)
 
 (get-breed)
 
