@@ -17,7 +17,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; abstraction and modularization and stuffs
+;; abstraction and modularization and stuffs (7/16/2014)
 
 (defn ->str
   "keyword->string, dropping the leading :"
@@ -66,8 +66,7 @@
 ;;       => (#'ns/do-this-to-it :some-property)
 ;;       => ? whatever the output is of the last fn
 ;;
-;; macro-it-ize this from piece to piece...
-;; first, the end result for a simple case:
+;; macro-it-ize this from piece to piece... (7/16/2014)
 
 (defn get-id [] :id)
 
@@ -76,7 +75,7 @@
 
 ;; Bah hahahahaha! you can offset the evaluation of the defn, thereby
 ;; ignoring its whole "oh, I need a symbol as my first argument ah-derp"
-;; situation.
+;; situation. (7/16/2014)
 
 (macroexpand (getter prop))
 (macroexpand (gen-fn-from-prop :get :potato identity))
@@ -89,7 +88,7 @@
 (getter 'id)
 
 ;; this declare/binding thing is kind of gross.
-;; I don't like it, really.
+;; I don't like it, really. (7/16/2014)
 
 (declare id)
 (declare ^:dynamic id)
@@ -139,7 +138,7 @@
 
 ;; actually, it doesn't much make sense to create a "setter"
 ;; the properties object will probably be reconstructed instead of
-;; its values changed.
+;; its values changed. (7/16/2014)
 
 ;; let's try a more practical example...
 
@@ -165,7 +164,7 @@ turtle-properties
 (get-size)
 (get-hidden?)
 
-;; hooray! It works.
+;; hooray! It works. (7/16/2014)
 
 
 
