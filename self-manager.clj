@@ -14,6 +14,9 @@
         ;;
         ;; also this error handling is not appropos
         ;; (7/18/2014)
+        ;; By the way: if i output to js/console,
+        ;; I will break the tests
+        ;; ... so don't do that. (7/18/2014)
         (catch Exception e (str "Caught Ex. : "
                                 (.getMessage e)))
         ))))
@@ -41,3 +44,6 @@
      #((ask-agent report-selfs) 'turtle-1))
     'turtle-0)
    "turtle-1 turtle-0")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
