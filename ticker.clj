@@ -13,6 +13,9 @@
 ;; NOTE: does no error checking or exception
 ;;       throwing. (7/17/2014)
 
+;; FIXME: ticker can be static,
+;; no need for protocol/record structure.
+
 (defprotocol ITicker
   (tick  [t] "increments the tick count")
   (reset [t] "resets the tick count")
