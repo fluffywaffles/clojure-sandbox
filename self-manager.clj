@@ -1,7 +1,7 @@
 (ns self-manager)
 
-(def ^:dynamic _self 0)
-(def ^:dynamic _myself 0)
+(def ^:dynamic ^:private _self 0)
+(def ^:dynamic ^:private _myself 0)
 
 (defn ask-agent [f]
   (fn [agent]
@@ -9,17 +9,18 @@
               _self agent]
       (try (f)
         ;; NOTE:
-        ;; in clojurescript, replace Exception with js/Object
-        ;; write to log then by (.log js/console e)
-        ;; NOTE: also this error handling is not appropos
+        ;; in clojurescript, js/Object = Exception
+        ;; write to log by (.log js/console e)
+        ;;
+        ;; also this error handling is not appropos
         ;; (7/18/2014)
-        (catch Exception e (str "Caught Ex. : " (.getMessage e)))
+        (catch Exception e (str "Caught Ex. : "
+                                (.getMessage e)))
         ))))
 
 (defn get-self [] @#'_self)
 
 (defn get-myself [] @#'_myself)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  sanity checks                            (7/18/2014)  ;;

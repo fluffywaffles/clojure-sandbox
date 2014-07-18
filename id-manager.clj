@@ -6,7 +6,7 @@
 ;; what its id should be. (7/17/2014)
 ;;
 
-(def _count (atom 0))
+(def ^:private _count (atom 0))
 
 (defn reset [] (reset! _count 0))
 (defn next-id [] (swap! _count inc))
@@ -20,7 +20,7 @@
 ;; hence this. (7/17/2014)
 ;;
 
-(def _prev_count (atom nil))
+(def ^:private _prev_count (atom nil))
 
 (add-watch _count :prev
            (fn [_key _ref old-state _new-state]
