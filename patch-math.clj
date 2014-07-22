@@ -1,5 +1,4 @@
 (ns topology.patch-math
-  (:require [util.math :refer [clamp]])
   (:use topology.vars)) ;; should refer get-patch-at from world(?)
 
 (defn get-patch-at [x y]
@@ -56,24 +55,46 @@
 
 ;; can memoize all the get-patch-es.
 
+;; get neighbors
+
+(defn get-neighbors-4 [x y]
+  (filter #(not= % nil)
+          [(get-patch-north x y)
+           (get-patch-east x y)
+           (get-patch-south x y)
+           (get-patch-west x y)]))
+
+(defn get-neighbors [x y]
+  (concat
+   (get-neighbors-4 x y)
+   (filter #(not= % nil)
+           [(get-patch-northeast x y)
+            (get-patch-northwest x y)
+            (get-patch-southwest x y)
+            (get-patch-southeast x y)])))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;  sanity checks                            (7/21/2014)  ;;
+;;  sanity checks                            (7/22/2014)  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (ns topology.patch-math.sanity-checks
   (:use topology.vars)
-  (:refer topology.patch-math :rename { get-patch-north gpn
-                                        get-patch-northeast gpne
-                                        get-patch-east gpe
-                                        get-patch-southeast gpse
-                                        get-patch-south gps
-                                        get-patch-southwest gpsw
-                                        get-patch-west gpw
-                                        get-patch-northwest gpnw
-                                        get-patch-at gp
-                                        wrap-x wrap-x
-                                        wrap-y wrap-y
-                                        wrap wrap}))
+  (:refer util.in?)
+  (:refer topology.patch-math
+          :rename { get-patch-north     gpn
+                    get-patch-northeast gpne
+                    get-patch-east      gpe
+                    get-patch-southeast gpse
+                    get-patch-south     gps
+                    get-patch-southwest gpsw
+                    get-patch-west      gpw
+                    get-patch-northwest gpnw
+                    get-patch-at        gp
+                    wrap-x              wrap-x
+                    wrap-y              wrap-y
+                    wrap                wrap
+                    get-neighbors-4     gn4
+                    get-neighbors       gn    }))
 
 (binding [min-pxcor -5
           max-pxcor 5
@@ -104,7 +125,15 @@
    (= (gpne 5 5) (gp -5 -5))
    (= (gpsw -5 -5) (gp 5 5))
    (= (gpnw -5 5) (gp 5 -5))
-   (= (gpse 5 -5) (gp -5 5))))
+   (= (gpse 5 -5) (gp -5 5))
+
+   (= (take 8 (repeat true))
+      (let [neighbors (gn 0 0)]
+        (map #(in? neighbors %) [(gp 0 1) (gp 1  0) (gp 0  -1) (gp -1 0)
+                                 (gp 1 1) (gp 1 -1) (gp -1 -1) (gp -1 1)])))
+   (= (take 4 (repeat true))
+      (let [neighbors (gn4 0 0)]
+        (map #(in? neighbors %) [(gp 0 1) (gp 1 0) (gp 0 -1) (gp -1 0)])))))
 
 (binding [min-pxcor -5
           max-pxcor 5
@@ -136,14 +165,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                                                      ;;
-;; directly translated wrap seems to be doing something ;;
-;; really strange?                                      ;;
-;;                                                      ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                        ;;
+;; directly translated wrap seems to be doing something   ;;
+;; really strange?                                        ;;
+;;                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;;;;;;;;;; WRAP CHECKS ;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;; WRAP CHECKS ;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn directly-translated-wrap [pos mn mx]
   (cond
@@ -205,4 +234,3 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-

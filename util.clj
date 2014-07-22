@@ -9,3 +9,8 @@
   (cond (> v mx) mx
         (< v mn) mn
         :default v))
+
+(ns util.in?)
+
+(defn in? [col elm]
+  (some #(= elm %) col))
