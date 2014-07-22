@@ -115,7 +115,7 @@
   (and
     (= nil
        (gpn 5 5)
-       (gpne 5 5)
+       (gpe 5 5)
        (gpne 5 5))
 
     (= nil
