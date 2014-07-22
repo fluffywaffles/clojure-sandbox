@@ -31,31 +31,60 @@
 
 ;; direct neighbors (eg getNeighbors4 patches)
 
-(defn get-patch-north [x y] (get-patch-at  x (wrap-y (inc y))))
+(defn _get_patch_north [x y] (get-patch-at  x (wrap-y (inc y))))
 
-(defn get-patch-east  [x y] (get-patch-at (wrap-x (inc x)) y))
+(defn _get_patch_east  [x y] (get-patch-at (wrap-x (inc x)) y))
 
-(defn get-patch-south [x y] (get-patch-at  x (wrap-y (dec y))))
+(defn _get_patch_south [x y] (get-patch-at  x (wrap-y (dec y))))
 
-(defn get-patch-west  [x y] (get-patch-at (wrap-x (dec x)) y))
+(defn _get_patch_west  [x y] (get-patch-at (wrap-x (dec x)) y))
 
 ;; corners
 
-(defn get-patch-northeast [x y]
+(defn _get_patch_northeast [x y]
   (get-patch-at (wrap-x (inc x)) (wrap-y (inc y))))
 
-(defn get-patch-southeast [x y]
+(defn _get_patch_southeast [x y]
   (get-patch-at (wrap-x (inc x)) (wrap-y (dec y))))
 
-(defn get-patch-southwest [x y]
+(defn _get_patch_southwest [x y]
   (get-patch-at (wrap-x (dec x)) (wrap-y (dec y))))
 
-(defn get-patch-northwest [x y]
+(defn _get_patch_northwest [x y]
   (get-patch-at (wrap-x (dec x)) (wrap-y (inc y))))
 
-;; can memoize all the get-patch-es.
+;; can memoize all the things. :D
+;; perhaps will not want/need to memoize EVERYTHING,
+;; but for now just everything.
+
+(defmacro ^:private memoizer [name-gen fun]
+  `(list 'def
+         (~name-gen ~fun)
+         `(memoize ~~fun)))
+
+;; I have to dbl quote (memoize fun) b/c I want it to run at
+;;  the time the macro runs, not when the macro compiles.
+
+(defn ^:private _to- [_] (->> _
+                              str
+                              rest
+                              (replace {\_ \-})
+                              clojure.string/join))
+
+(map #(->> % (memoizer (fn [n] (symbol (_to- n)))) eval)
+                                   '(_get_patch_north
+                                     _get_patch_east
+                                     _get_patch_south
+                                     _get_patch_west
+                                     _get_patch_northeast
+                                     _get_patch_southeast
+                                     _get_patch_southwest
+                                     _get_patch_northwest))
 
 ;; get neighbors
+
+;; if the fns inside of get-neighbors are memoized,
+;; is there a point to memoizing get-neighbors?
 
 (defn get-neighbors-4 [x y]
   (filter #(not= % nil)
