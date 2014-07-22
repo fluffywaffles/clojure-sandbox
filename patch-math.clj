@@ -6,12 +6,14 @@
   "stub (and in the wrong place)"
   {:id -1 :name (str "Patch " x " " y)})
 
+;; wrap is tentatively corrected from the version found in
+;;  topology.coffee (translated into clojure below)
+;;  justification also below.
 (defn wrap [pos mn mx]
   (cond
-   (> pos mx) (-> pos (- mx) (mod (- mx mn)) (+ mn))
-   (< pos mn) (let [diff (-> (- mn pos)
-                             (mod (- mx mn)))] ;; ((min - pos) % (max - min))
-                (if (= diff 0) mn (- mx diff)))
+   (> pos mx) (-> pos (- mx) (mod (- mx mn)) (+ (dec mn)))
+   (< pos mn) (- (inc mx) (-> (- mn pos)
+                              (mod (- mx mn)))) ;; ((min - pos) % (max - min))
    :default pos))
 
 (defn wrap-y [y]
@@ -52,23 +54,10 @@
 
 ;; can memoize all the get-patch-es.
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  sanity checks                            (7/21/2014)  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(-> 6 (- 5) (mod (- 5 -5)) (+ -5))
-
-(+ -5 (mod (- 6 5) (- 5 -5)))
-
-;; I do not like this one bit.
-
-(- 5 (-> (- -5 -6) (mod (- 5 -5))))
-
-;; ok that's correct
-
-(when (= (-> (- -5 -5) (mod (- 5 -5))) 0) -5)
-
-;; and that math works out fine...
 
 (ns topology.patch-math.sanity-checks
   (:use topology.patch-math))
@@ -106,3 +95,75 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                      ;;
+;; directly translated wrap seems to be doing something ;;
+;; really strange?                                      ;;
+;;                                                      ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;; WRAP CHECKS ;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn directly-translated-wrap [pos mn mx]
+  (cond
+   (>= pos mx) (-> pos (- mx) (mod (- mx mn)) (+ mn))
+   (< pos mn) (let [diff (-> (- mn pos)
+                             (mod (- mx mn)))] ;; ((min - pos) % (max - min))
+                (if (= diff 0) mn (- mx diff)))
+   :default pos))
+
+(-> 6 (- 5) (mod (- 5 -5)) (+ -5)) ;; -4
+;; equivalent to:
+(directly-translated-wrap 6 -5 5) ;; -4
+
+;; uh... what happened to xcor/ycor -5?
+
+;; I do not like this.
+
+(- 5 (-> (- -5 -6) (mod (- 5 -5)))) ;; 4
+;; equivalent to
+(directly-translated-wrap -6 -5 5) ;; 4
+
+;; or that.
+
+(when (= (-> (- -5 -5) (mod (- 5 -5))) 0) -5)
+
+;; but that math works out fine (duh)...
+
+;; Dafuk. a -5,5 grid (10x10) is actually 11x11 in Nlogo
+;;  because of course it is.
+;; And if you tell netlogo to make a -4,4 grid, that
+;;  grid is 9x9. So... in Netlogo, you can only have
+;;  odd sidelength grids.
+;; If you are at patch 0,5, for that matter, the wrapping
+;;  algorithm as written wraps you to 0,-5. What dafuk
+;;  happened to 0,5?
+
+;; see?
+
+(directly-translated-wrap 5 -5 5)
+
+;; Aha. While _wrap(6, -5, 5) yields the wrong answer (-4),
+;;  actually testing wrapX or wrapY in the engine yields
+;;  the correct answer (-5). How...?
+;; In the current version of Tortoise, this is solved
+;;  by adding/subtracting 0.5 from min/max Px/ycor in
+;;  the definitions for wrapX and wrapY. Which is
+;;  confusing if you think you're going to use _wrap
+;;  to like actually wrap values.
+;; I think the behavior of _wrap is incorrect, b/c
+;;  _wrap(6, -5, 5) is clearly wrong if it spits out -4.
+
+(-> 5 (- 5) (mod 10) (+ -5))
+
+(wrap -5 -5 5)  ;; -5
+(wrap -6 -5 5)  ;; 5
+(wrap -10 -5 5) ;; 1
+(wrap 5 -5 5)   ;; 5
+(wrap 6 -5 5)   ;; -5
+(wrap 10 -5 5)  ;; -1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
