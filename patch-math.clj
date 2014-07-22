@@ -60,7 +60,19 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (ns topology.patch-math.sanity-checks
-  (:use topology.patch-math))
+  (:refer topology.patch-math :rename { get-patch-north gpn
+                                         get-patch-northeast gpne
+                                         get-patch-east gpe
+                                         get-patch-southeast gpse
+                                         get-patch-south gps
+                                         get-patch-southwest gpsw
+                                         get-patch-west gpw
+                                         get-patch-northwest gpnw
+                                         get-patch-at gp
+                                         wrap-x wrap-x
+                                         wrap-y wrap-y
+                                         wrap wrap})
+  (:use topology.vars))
 
 (binding [min-pxcor -5
           max-pxcor 5
@@ -68,8 +80,18 @@
           max-pycor 5
           wrap-in-x? true
           wrap-in-y? true]
-  (get-patch-at 5 5)
-  (get-patch-north 5 5))
+  (and
+   ;; wrap equivalency checks
+   (= (wrap-x 5) (wrap-y 5) (wrap 5 -5 5) 5)
+   (= (wrap-x -5) (wrap-y -5) (wrap -5 -5 5) -5)
+
+   (= (wrap-x 6) (wrap-y 6) (wrap 6 -5 5) -5)
+   (= (wrap-x -6) (wrap-y -6) (wrap -6 -5 5) 5)
+
+   (= (wrap-x 10) (wrap-y 10) (wrap 10 -5 5) -1)
+   (= (wrap-x -10) (wrap-y -10) (wrap -10 -5 5) 1)
+
+   ))
 
 (binding [min-pxcor -5
           max-pxcor 5
@@ -78,20 +100,25 @@
           wrap-in-x? false
           wrap-in-y? false]
   (and
-    (= (get-patch-at 5 5)
-       (get-patch-north 5 5)
-       (get-patch-northeast 5 5)
-       (get-patch-east 5 5))
+    (= (gp 5 5)
+       (gpn 5 5)
+       (gpne 5 5)
+       (gpne 5 5))
 
-    (= (get-patch-north 0 0) (get-patch-at 0 1))
-    (= (get-patch-east  0 0) (get-patch-at 1 0))
-    (= (get-patch-south 0 0) (get-patch-at 0 -1))
-    (= (get-patch-west 0 0) (get-patch-at -1 0))
+    (= (gp -5 -5)
+       (gps -5 -5)
+       (gpw -5 -5)
+       (gpsw -5 -5))
 
-    (= (get-patch-northeast 0 0) (get-patch-at 1 1))
-    (= (get-patch-southeast 0 0) (get-patch-at 1 -1))
-    (= (get-patch-southwest 0 0) (get-patch-at -1 -1))
-    (= (get-patch-northwest 0 0) (get-patch-at -1 1))))
+    (= (gpn 0 0) (gp 0  1))
+    (= (gpe 0 0) (gp 1  0))
+    (= (gps 0 0) (gp 0 -1))
+    (= (gpw 0 0) (gp -1 0))
+
+    (= (gpne 0 0) (gp 1   1))
+    (= (gpse 0 0) (gp 1  -1))
+    (= (gpsw 0 0) (gp -1 -1))
+    (= (gpnw 0 0) (gp -1  1))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -121,7 +148,6 @@
 
 ;; I do not like this.
 
-(- 5 (-> (- -5 -6) (mod (- 5 -5)))) ;; 4
 ;; equivalent to
 (directly-translated-wrap -6 -5 5) ;; 4
 
