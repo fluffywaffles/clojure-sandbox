@@ -125,71 +125,100 @@
                     get-neighbors-4     gn4
                     get-neighbors       gn    }))
 
-(binding [min-pxcor -5
-          max-pxcor 5
-          min-pycor -5
-          max-pycor 5
-          wrap-in-x? true
-          wrap-in-y? true]
-  (and
-   ;; wrap equivalency checks
-   (= (wrap-x 5) (wrap-y 5) (wrap 5 -5 5) 5)
-   (= (wrap-x -5) (wrap-y -5) (wrap -5 -5 5) -5)
+(def d-min-pxcor (atom -5))
+(def d-max-pxcor  (atom 5))
+(def d-min-pycor (atom -5))
+(def d-max-pycor  (atom 5))
+(def d-wrap-in-x? (atom true))
+(def d-wrap-in-y? (atom true))
 
-   (= (wrap-x 6) (wrap-y 6) (wrap 6 -5 5) -5)
-   (= (wrap-x -6) (wrap-y -6) (wrap -6 -5 5) 5)
+;;(defmacro bind-and-do [stuff]
+;;  `(list 'binding
+;;            '[min-pxcor  @d-min-pxcor
+;;              max-pxcor  @d-max-pxcor
+;;              min-pycor  @d-min-pycor
+;;              max-pycor  @d-max-pycor
+;;              wrap-in-x? @d-wrap-in-x?
+;;              wrap-in-y? @d-wrap-in-y?]
+;;    ~stuff))
 
-   (= (wrap-x 10) (wrap-y 10) (wrap 10 -5 5) -1)
-   (= (wrap-x -10) (wrap-y -10) (wrap -10 -5 5) 1)
+;; and after all that, it turns out (with-bindings) already exists in clojure.core. whatever.
 
-   (= (wrap-x 101) (wrap-y 101) (wrap 101 -5 5) 0)
-   (= (wrap-x -101) (wrap-y -101) (wrap -101 -5 5) 0)
+(defmacro bind-and-do [stuff]
+  `(with-bindings {#'min-pxcor  ~'@d-min-pxcor
+                   #'max-pxcor  ~'@d-max-pxcor
+                   #'min-pycor  ~'@d-min-pycor
+                   #'max-pycor  ~'@d-max-pycor
+                   #'wrap-in-x? ~'@d-wrap-in-x?
+                   #'wrap-in-y? ~'@d-wrap-in-y?} ~stuff))
 
-   ;; get-patch wrap checks
-   (= (gpn 0 5) (gp 0 -5))
-   (= (gps 0 -5) (gp 0 5))
-   (= (gpe 5 0) (gp -5 0))
-   (= (gpw -5 0) (gp 5 0))
+;; wrap equivalency checks
+(bind-and-do (= (wrap-x 5) (wrap-y 5) (wrap 5 -5 5) 5))
+(bind-and-do (= (wrap-x -5) (wrap-y -5) (wrap -5 -5 5) -5))
 
-   (= (gpne 5 5) (gp -5 -5))
-   (= (gpsw -5 -5) (gp 5 5))
-   (= (gpnw -5 5) (gp 5 -5))
-   (= (gpse 5 -5) (gp -5 5))
+(bind-and-do (= (wrap-x 6) (wrap-y 6) (wrap 6 -5 5) -5))
+(reset! d-wrap-in-x? true)
+(reset! d-max-pxcor 5)
+(bind-and-do (wrap-x 6))
+(bind-and-do (wrap-y 6))
+(bind-and-do (wrap 6 -5 5))
 
-   (= (take 8 (repeat true))
-      (let [neighbors (gn 0 0)]
-        (map #(in? neighbors %) [(gp 0 1) (gp 1  0) (gp 0  -1) (gp -1 0)
-                                 (gp 1 1) (gp 1 -1) (gp -1 -1) (gp -1 1)])))
-   (= (take 4 (repeat true))
-      (let [neighbors (gn4 0 0)]
-        (map #(in? neighbors %) [(gp 0 1) (gp 1 0) (gp 0 -1) (gp -1 0)])))))
+;; wrap-x and wrap-y respect the bindings. The other fns? Not.
+;; WHYY? ohhhhh wait. It's because they are memoized. Ha! Oh shit. That was stupid.
 
-(binding [min-pxcor -5
-          max-pxcor 5
-          min-pycor -5
-          max-pycor 5
-          wrap-in-x? false
-          wrap-in-y? false]
-  (and
-    (= nil
-       (gpn 5 5)
-       (gpe 5 5)
-       (gpne 5 5))
+(bind-and-do (= (wrap-x -6) (wrap-y -6) (wrap -6 -5 5) 5))
 
+(bind-and-do (= (wrap-x 10) (wrap-y 10) (wrap 10 -5 5) -1))
+(bind-and-do (= (wrap-x -10) (wrap-y -10) (wrap -10 -5 5) 1))
+
+(bind-and-do (= (wrap-x 101) (wrap-y 101) (wrap 101 -5 5) 0))
+(bind-and-do (= (wrap-x -101) (wrap-y -101) (wrap -101 -5 5) 0))
+
+;; get-patch wrap checks
+(bind-and-do (= (gpn 0 5) (gp 0 -5)))
+(bind-and-do (= (gps 0 -5) (gp 0 5)))
+(bind-and-do (= (gpe 5 0) (gp -5 0)))
+(bind-and-do (= (gpw -5 0) (gp 5 0)))
+
+(bind-and-do (= (gpne 5 5) (gp -5 -5)))
+(bind-and-do (= (gpsw -5 -5) (gp 5 5)))
+(bind-and-do (= (gpnw -5 5) (gp 5 -5)))
+(bind-and-do (= (gpse 5 -5) (gp -5 5)))
+
+(bind-and-do (= (take 8 (repeat true))
+   (let [neighbors (gn 0 0)]
+     (map #(in? neighbors %) [(gp 0 1) (gp 1  0) (gp 0  -1) (gp -1 0)
+                              (gp 1 1) (gp 1 -1) (gp -1 -1) (gp -1 1)]))))
+
+(bind-and-do (= (take 4 (repeat true))
+   (let [neighbors (gn4 0 0)]
+     (map #(in? neighbors %) [(gp 0 1) (gp 1 0) (gp 0 -1) (gp -1 0)]))))
+
+(bind-and-do (= (gpn 0 0) (gp 0  1)))
+(bind-and-do (= (gpe 0 0) (gp 1  0)))
+(bind-and-do (= (gps 0 0) (gp 0 -1)))
+(bind-and-do (= (gpw 0 0) (gp -1 0)))
+
+(bind-and-do (= (gpne 0 0) (gp 1   1)))
+(bind-and-do (= (gpse 0 0) (gp 1  -1)))
+(bind-and-do (= (gpsw 0 0) (gp -1 -1)))
+(bind-and-do (= (gpnw 0 0) (gp -1  1)))
+
+(reset! d-max-pycor 0)
+
+(bind-and-do (gpn 5 5))
+
+(bind-and-do
+  (= nil
+    (gpn 5 5)
+    (gpe 5 5)
+    (gpne 5 5)))
+
+(bind-and-do
     (= nil
        (gps -5 -5)
        (gpw -5 -5)
-       (gpsw -5 -5))
-
-    (= (gpn 0 0) (gp 0  1))
-    (= (gpe 0 0) (gp 1  0))
-    (= (gps 0 0) (gp 0 -1))
-    (= (gpw 0 0) (gp -1 0))
-
-    (= (gpne 0 0) (gp 1   1))
-    (= (gpse 0 0) (gp 1  -1))
-    (= (gpsw 0 0) (gp -1 -1))
-    (= (gpnw 0 0) (gp -1  1))))
+       (gpsw -5 -5)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
