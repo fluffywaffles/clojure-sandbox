@@ -2,6 +2,7 @@
   (:use topology.vars))
 
 ;; hand topology the functions it needs from world
+;; (I believe all it should need is get-patch-at)
 
 ;; memoize all the things? or just some?
 

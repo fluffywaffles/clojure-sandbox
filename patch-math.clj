@@ -145,12 +145,12 @@
 ;; and after all that, it turns out (with-bindings) already exists in clojure.core. whatever.
 
 (defmacro bind-and-do [stuff]
-  `(with-bindings {#'min-pxcor  ~'@d-min-pxcor
-                   #'max-pxcor  ~'@d-max-pxcor
-                   #'min-pycor  ~'@d-min-pycor
-                   #'max-pycor  ~'@d-max-pycor
-                   #'wrap-in-x? ~'@d-wrap-in-x?
-                   #'wrap-in-y? ~'@d-wrap-in-y?} ~stuff))
+  `(with-bindings {#'min-pxcor  @d-min-pxcor
+                   #'max-pxcor  @d-max-pxcor
+                   #'min-pycor  @d-min-pycor
+                   #'max-pycor  @d-max-pycor
+                   #'wrap-in-x? @d-wrap-in-x?
+                   #'wrap-in-y? @d-wrap-in-y?} ~stuff))
 
 ;; wrap equivalency checks
 (bind-and-do (= (wrap-x 5) (wrap-y 5) (wrap 5 -5 5) 5))

@@ -11,3 +11,6 @@
    wrap-in-y? true ]
 
    width)
+
+;; instantiate a record within inheritant-bind - does it retain access to those values?
+
