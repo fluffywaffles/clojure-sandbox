@@ -91,7 +91,19 @@
    (= (wrap-x 10) (wrap-y 10) (wrap 10 -5 5) -1)
    (= (wrap-x -10) (wrap-y -10) (wrap -10 -5 5) 1)
 
-   ))
+   (= (wrap-x 101) (wrap-y 101) (wrap 101 -5 5) 0)
+   (= (wrap-x -101) (wrap-y -101) (wrap -101 -5 5) 0)
+
+   ;; get-patch wrap checks
+   (= (gpn 0 5) (gp 0 -5))
+   (= (gps 0 -5) (gp 0 5))
+   (= (gpe 5 0) (gp -5 0))
+   (= (gpw -5 0) (gp 5 0))
+
+   (= (gpne 5 5) (gp -5 -5))
+   (= (gpsw -5 -5) (gp 5 5))
+   (= (gpnw -5 5) (gp 5 -5))
+   (= (gpse 5 -5) (gp -5 5))))
 
 (binding [min-pxcor -5
           max-pxcor 5
