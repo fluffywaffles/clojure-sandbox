@@ -119,8 +119,8 @@
 
 (def properties {:id "a"})
 
-(macroexpand (gen-fn-from-prop :get :id #(#'turtle/properties %)))
-(eval (gen-fn-from-prop :get :id #(#'turtle/properties %)))
+(macroexpand (gen-fn-from-prop :get :id #(properties %)))
+(eval (gen-fn-from-prop :get :id #(properties %)))
 (get-id)
 
 (defmacro turtle-prop-getter [prop]
@@ -175,7 +175,8 @@ turtle-properties
 
 (ns-map *ns*)
 
-(deref #'turtle/properties)
+(deref #'properties)
 
 (in-ns 'turtle.innards)
 
+(ns prop)
