@@ -1,13 +1,15 @@
 (ns topology.patch-math
   (:require [util.math :refer [clamp]])
-  (:use topology.vars)) ;; should refer get-patch-at from world
+  (:use topology.vars)) ;; should refer get-patch-at from world(?)
 
 (defn get-patch-at [x y]
   "stub (and in the wrong place)"
-  {:id -1 :name (str "Patch " x " " y)})
+  (if (and (<= min-pxcor x max-pxcor)
+           (<= min-pycor y max-pycor))
+    {:id -1 :name (str "Patch " x " " y)}))
 
 ;; wrap is tentatively corrected from the version found in
-;;  topology.coffee (translated into clojure below)
+;;  topology.coffee (translated into clojure below).
 ;;  justification also below.
 (defn wrap [pos mn mx]
   (cond
@@ -19,14 +21,14 @@
 (defn wrap-y [y]
   (if wrap-in-y?
     (wrap y min-pycor max-pycor)
-    (clamp y min-pycor max-pycor)))
+    y))
 
 ;; topology wraps, but so does world.getPatchAt ??
 
 (defn wrap-x [x]
   (if wrap-in-x?
     (wrap x min-pxcor max-pxcor)
-    (clamp x min-pxcor max-pxcor)))
+    x))
 
 ;; direct neighbors (eg getNeighbors4 patches)
 
@@ -54,25 +56,24 @@
 
 ;; can memoize all the get-patch-es.
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  sanity checks                            (7/21/2014)  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (ns topology.patch-math.sanity-checks
+  (:use topology.vars)
   (:refer topology.patch-math :rename { get-patch-north gpn
-                                         get-patch-northeast gpne
-                                         get-patch-east gpe
-                                         get-patch-southeast gpse
-                                         get-patch-south gps
-                                         get-patch-southwest gpsw
-                                         get-patch-west gpw
-                                         get-patch-northwest gpnw
-                                         get-patch-at gp
-                                         wrap-x wrap-x
-                                         wrap-y wrap-y
-                                         wrap wrap})
-  (:use topology.vars))
+                                        get-patch-northeast gpne
+                                        get-patch-east gpe
+                                        get-patch-southeast gpse
+                                        get-patch-south gps
+                                        get-patch-southwest gpsw
+                                        get-patch-west gpw
+                                        get-patch-northwest gpnw
+                                        get-patch-at gp
+                                        wrap-x wrap-x
+                                        wrap-y wrap-y
+                                        wrap wrap}))
 
 (binding [min-pxcor -5
           max-pxcor 5
@@ -112,12 +113,12 @@
           wrap-in-x? false
           wrap-in-y? false]
   (and
-    (= (gp 5 5)
+    (= nil
        (gpn 5 5)
        (gpne 5 5)
        (gpne 5 5))
 
-    (= (gp -5 -5)
+    (= nil
        (gps -5 -5)
        (gpw -5 -5)
        (gpsw -5 -5))
