@@ -65,26 +65,51 @@
 ;; I have to dbl quote (memoize fun) b/c I want it to run at
 ;;  the time the macro runs, not when the macro compiles.
 
-(defn ^:private _to- [_] (->> _
-                              str
+(defn ^:private dequalify [f]
+  (-> f
+      str
+      (clojure.string/split #"/")
+      last))
+
+(defn ^:private _to- [_] (->> (dequalify _)
                               rest
                               (replace {\_ \-})
                               clojure.string/join))
 
-(map #(->> % (memoizer (fn [n] (symbol (_to- n)))) eval)
-                                   '(_get_patch_north
-                                     _get_patch_east
-                                     _get_patch_south
-                                     _get_patch_west
-                                     _get_patch_northeast
-                                     _get_patch_southeast
-                                     _get_patch_southwest
-                                     _get_patch_northwest))
+(defn memorize-by [fn]
+  (map #(->> % (memoizer fn) eval)
+       '(_get_patch_north
+         _get_patch_east
+         _get_patch_south
+         _get_patch_west
+         _get_patch_northeast
+         _get_patch_southeast
+         _get_patch_southwest
+         _get_patch_northwest)))
+
+(memorize-by (fn [n] (symbol (_to- n))))
 
 ;; get neighbors
 
+(defn _get_neighbors_4 [x y]
+   (filter #(not= % nil)
+          [(_get_patch_north x y)
+           (_get_patch_east x y)
+           (_get_patch_south x y)
+           (_get_patch_west x y)]))
+
+(defn _get_neighbors [x y]
+  (concat
+    (_get_neighbors_4 x y)
+    (filter #(not= % nil)
+          [(_get_patch_northeast x y)
+           (_get_patch_northwest x y)
+           (_get_patch_southwest x y)
+           (_get_patch_southeast x y)])))
+
+
 ;; if the fns inside of get-neighbors are memoized,
-;; is there a point to memoizing get-neighbors?
+;; I don't think there's a point to memoizing get-neighbors?
 
 (defn get-neighbors-4 [x y]
   (filter #(not= % nil)
@@ -95,8 +120,8 @@
 
 (defn get-neighbors [x y]
   (concat
-   (get-neighbors-4 x y)
-   (filter #(not= % nil)
+    (get-neighbors-4 x y)
+    (filter #(not= % nil)
            [(get-patch-northeast x y)
             (get-patch-northwest x y)
             (get-patch-southwest x y)
@@ -106,24 +131,27 @@
 ;;  sanity checks                            (7/22/2014)  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; IMPORTANT: tests should use unmemoized versions bc I
+;; want to change the underlying values and get a computed,
+;; not STORED, result.
+
+;; Memoization should still be used by all topology types tho.
+
 (ns topology.patch-math.sanity-checks
   (:use topology.vars)
   (:refer util.in?)
   (:refer topology.patch-math
-          :rename { get-patch-north     gpn
-                    get-patch-northeast gpne
-                    get-patch-east      gpe
-                    get-patch-southeast gpse
-                    get-patch-south     gps
-                    get-patch-southwest gpsw
-                    get-patch-west      gpw
-                    get-patch-northwest gpnw
-                    get-patch-at        gp
-                    wrap-x              wrap-x
-                    wrap-y              wrap-y
-                    wrap                wrap
-                    get-neighbors-4     gn4
-                    get-neighbors       gn    }))
+          :rename { _get_patch_north     gpn
+                    _get_patch_northeast gpne
+                    _get_patch_east      gpe
+                    _get_patch_southeast gpse
+                    _get_patch_south     gps
+                    _get_patch_southwest gpsw
+                    _get_patch_west      gpw
+                    _get_patch_northwest gpnw
+                    get-patch-at         gp
+                    _get_neighbors_4      gn4
+                    _get_neighbors        gn}))
 
 (def d-min-pxcor (atom -5))
 (def d-max-pxcor  (atom 5))
@@ -157,11 +185,6 @@
 (bind-and-do (= (wrap-x -5) (wrap-y -5) (wrap -5 -5 5) -5))
 
 (bind-and-do (= (wrap-x 6) (wrap-y 6) (wrap 6 -5 5) -5))
-(reset! d-wrap-in-x? true)
-(reset! d-max-pxcor 5)
-(bind-and-do (wrap-x 6))
-(bind-and-do (wrap-y 6))
-(bind-and-do (wrap 6 -5 5))
 
 ;; wrap-x and wrap-y respect the bindings. The other fns? Not.
 ;; WHYY? ohhhhh wait. It's because they are memoized. Ha! Oh shit. That was stupid.
@@ -204,9 +227,8 @@
 (bind-and-do (= (gpsw 0 0) (gp -1 -1)))
 (bind-and-do (= (gpnw 0 0) (gp -1  1)))
 
-(reset! d-max-pycor 0)
-
-(bind-and-do (gpn 5 5))
+(reset! d-wrap-in-x? false)
+(reset! d-wrap-in-y? false)
 
 (bind-and-do
   (= nil
@@ -219,6 +241,8 @@
        (gps -5 -5)
        (gpw -5 -5)
        (gpsw -5 -5)))
+
+;; success!
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
