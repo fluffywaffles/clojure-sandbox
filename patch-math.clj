@@ -12,12 +12,16 @@
 ;;  justification also below.
 (defn wrap [pos mn mx]
   (cond
-    (> pos mx) (-> pos (- mx) (mod (- mx mn)) (+ (dec mn)))
-    (< pos mn) (- (inc mx) (-> (- mn pos)
+    ;; use >= to consistently return -5.5 for the "seam" of the
+    ;; wrapped shape -- i.e., -5.5 = 5.5, so consistently
+    ;; report -5.5 in order to have equality checks work
+    ;; correctly.
+    (>= pos mx) (-> pos (- mx) (mod (- mx mn)) (+ mn))
+    (< pos mn) (- mx (-> (- mn pos)
                                (mod (- mx mn)))) ;; ((min - pos) % (max - min))
     :default pos))
 
-(wrap -5.5 -5 5)
+(wrap 5 -5.5 5.5)
 
 (defn wrap-y [y]
   (if wrap-in-y?
@@ -332,8 +336,8 @@
 (wrap 5 -5 5)   ;; 5
 (wrap 6 -5 5)   ;; -5
 (wrap 10 -5 5)  ;; -1
-(wrap 5.5 -5 5)
-(directly-translated-wrap 6 -5.5 5.5)
+(wrap 5.5 -5.5 5.5)
+(directly-translated-wrap 5.5 -5.5 5.5)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

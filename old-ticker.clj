@@ -25,7 +25,7 @@
   (clear [_] (reset! _count_atom -1)))
 
 (defn create-ticker []
-  (let [t (ticker. (atom 0))] t))
+  (ticker. (atom 0)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  sanity checks                            (7/17/2014)  ;;
