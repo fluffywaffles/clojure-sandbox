@@ -132,6 +132,20 @@
             (get-patch-southwest x y)
             (get-patch-southeast x y)])))
 
+;; shortest-x
+;; It's weird af, but this mimics
+;; Tortoise EXCEPT in the case that
+;; the difference is greater than
+;; max-pxcor.
+;; In that case, shortest-x wraps
+;; the difference. _shortestX
+;; does not.
+(defn shortest-x [x1 x2]
+  (wrap-x (- x2 x1)))
+
+;; midpoints
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  sanity checks                            (7/22/2014)  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

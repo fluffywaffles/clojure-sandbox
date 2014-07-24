@@ -4,48 +4,26 @@
 ;; hand topology the functions it needs from world
 ;; (I believe all it should need is get-patch-at)
 
-;; memoize all the things? or just some?
-
-;; getNeighbors, getNeighbors4
-;; called often, rarely different inputs
-;; should be memo'd
-
-;; members
+;; funcs (will be implemented in patch-math)
 ;;
-;; height
-;; width
-
-;; funcs
-;;
-;; getNeighbors (px, py)
-;; getNeighbors4 (px, py) // ignores corners
 ;; distanceXY (x1, y1, x2, y2)
-;; distance (x, y, agent )
+;; distance (x, y, agent)
 ;; towards (x1, y1, x2, y2)
 ;; midpointx
 ;; midpointy
 ;; inRadius (x, y, agents, radius)
-;; wrap (pos, min, max)
-
-;; abstract members
-;;
-;; wrapX
-;; wrapY
 
 ;; abstract methods
 ;;
 ;; shortestX ;;wrapped vs origin distance btwn pnts
 ;; shortestY
-;; getPatchNorth
-;; getPatchEast
-;; getPatchSouth
-;; getPatchWest
-;; getPatchNorthEast
-;; getPatchSouthEast
-;; getPatchSouthWest
-;; getPatchNorthWest
-;; all the getPatches can be memoized
 
+;; def members when inheritant-bind is called.
+;;
+;; members
+;;
+;; width
+;; height
 
 (defmacro def-width []
   '(def width (- max-pxcor min-pxcor)))
