@@ -12,10 +12,12 @@
 ;;  justification also below.
 (defn wrap [pos mn mx]
   (cond
-   (> pos mx) (-> pos (- mx) (mod (- mx mn)) (+ (dec mn)))
-   (< pos mn) (- (inc mx) (-> (- mn pos)
-                              (mod (- mx mn)))) ;; ((min - pos) % (max - min))
-   :default pos))
+    (> pos mx) (-> pos (- mx) (mod (- mx mn)) (+ (dec mn)))
+    (< pos mn) (- (inc mx) (-> (- mn pos)
+                               (mod (- mx mn)))) ;; ((min - pos) % (max - min))
+    :default pos))
+
+(wrap -5.5 -5 5)
 
 (defn wrap-y [y]
   (if wrap-in-y?
@@ -76,6 +78,9 @@
                               (replace {\_ \-})
                               clojure.string/join))
 
+;; this is probably an unnecessary abstraction.
+;; but hopefully it'll be useful later?
+
 (defn memorize-by [fn]
   (map #(->> % (memoizer fn) eval)
        '(_get_patch_north
@@ -109,7 +114,7 @@
 
 
 ;; if the fns inside of get-neighbors are memoized,
-;; I don't think there's a point to memoizing get-neighbors?
+;; I don't think there's a point to memoizing get-neighbors(?)
 
 (defn get-neighbors-4 [x y]
   (filter #(not= % nil)
@@ -237,10 +242,10 @@
     (gpne 5 5)))
 
 (bind-and-do
-    (= nil
-       (gps -5 -5)
-       (gpw -5 -5)
-       (gpsw -5 -5)))
+  (= nil
+    (gps -5 -5)
+    (gpw -5 -5)
+    (gpsw -5 -5)))
 
 ;; success!
 
@@ -313,6 +318,8 @@
 (wrap 5 -5 5)   ;; 5
 (wrap 6 -5 5)   ;; -5
 (wrap 10 -5 5)  ;; -1
+(wrap 5.5 -5 5)
+(directly-translated-wrap 6 -5.5 5.5)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
