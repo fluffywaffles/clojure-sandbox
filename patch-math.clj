@@ -1,5 +1,6 @@
 (ns topology.patch-math
-  (:use topology.vars)) ;; should refer get-patch-at from world(?)
+  (:use topology.vars)
+  (:require [util.math :refer [squash]])) ;; should refer get-patch-at from world(?)
 
 (defn get-patch-at [x y]
   "stub (and in the wrong place)"
@@ -7,21 +8,23 @@
            (<= min-pycor y max-pycor))
     {:id -1 :name (str "Patch " x " " y)}))
 
+(defn squash-8 [v mn]
+  (squash v mn 1.0E-8))
+
 ;; wrap is tentatively corrected from the version found in
 ;;  topology.coffee (translated into clojure below).
 ;;  justification also below.
-(defn wrap [pos mn mx]
+(defn wrap [p mn mx]
+  (let [pos (squash-8 p mn)]
   (cond
     ;; use >= to consistently return -5.5 for the "seam" of the
     ;; wrapped shape -- i.e., -5.5 = 5.5, so consistently
     ;; report -5.5 in order to have equality checks work
     ;; correctly.
     (>= pos mx) (-> pos (- mx) (mod (- mx mn)) (+ mn))
-    (< pos mn) (- mx (-> (- mn pos)
-                               (mod (- mx mn)))) ;; ((min - pos) % (max - min))
-    :default pos))
-
-(wrap 5 -5.5 5.5)
+    (< pos mn)  (- mx (-> (- mn pos)
+                          (mod (- mx mn)))) ;; ((min - pos) % (max - min))
+    :default pos)))
 
 (defn wrap-y [y]
   (if wrap-in-y?

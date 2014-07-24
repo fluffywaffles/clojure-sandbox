@@ -10,6 +10,12 @@
         (< v mn) mn
         :default v))
 
+(defn squash [v to precision]
+  "squash 'v' to be 'to' if v - to < precision"
+  (if (< (- v to) precision)
+    to
+    v))
+
 (ns util.in?)
 
 (defn in? [col elm]
