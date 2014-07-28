@@ -1,5 +1,4 @@
-(ns topology.core
-  (:use [topology.vars :only [min-pxcor min-pycor max-pxcor max-pycor wrap-in-x? wrap-in-y?]]))
+(ns topology.core)
 
 ;; hand topology the functions it needs from world
 ;; (I believe all it should need is get-patch-at)
@@ -30,9 +29,6 @@
 
 (defmacro def-height []
   '(def height (- max-pycor min-pycor)))
-
-(defmacro add-patch-math-fn [f]
-  `(def ~f ~(symbol (str "topology.patch-math/" f))))
 
 (defmacro inheritant-bind [bind-block & body]
   `(binding ~bind-block
