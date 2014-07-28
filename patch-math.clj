@@ -15,6 +15,7 @@
 ;;  topology.coffee (translated into clojure below).
 ;;  justification also below.
 (defn wrap [p mn mx]
+  ;; squash so that -5.5000000001 != 5.5
   (let [pos (squash-8 p mn)]
   (cond
     ;; use >= to consistently return -5.5 for the "seam" of the
@@ -28,14 +29,14 @@
 
 (defn wrap-y [y]
   (if wrap-in-y?
-    (wrap y min-pycor max-pycor)
+    (wrap y (- min-pycor 0.5) (+ max-pycor 0.5))
     y))
 
 ;; topology wraps, but so does world.getPatchAt ??
 
 (defn wrap-x [x]
   (if wrap-in-x?
-    (wrap x min-pxcor max-pxcor)
+    (wrap x (- min-pxcor 0.5) (+ max-pxcor 0.5))
     x))
 
 ;; direct neighbors (eg getNeighbors4 patches)
@@ -139,19 +140,13 @@
             (get-patch-southwest x y)
             (get-patch-southeast x y)])))
 
-;; shortest-x
-;; It's weird af, but this mimics
-;; Tortoise EXCEPT in the case that
-;; the difference is greater than
-;; max-pxcor.
-;; In that case, shortest-x wraps
-;; the difference. _shortestX
-;; does not.
+;; shortest-x wraps a difference out of bounds.
+;; _shortestX does not.
 (defn shortest-x [x1 x2]
   (wrap-x (- x2 x1)))
 
-;; midpoints
-
+(defn shortest-y [y1 y2]
+  (wrap-y (- y2 y1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  sanity checks                            (7/22/2014)  ;;
