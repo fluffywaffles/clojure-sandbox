@@ -1,0 +1,21 @@
+// Compiled by ClojureScript 0.0-2268
+goog.provide('topology.torus');
+goog.require('cljs.core');
+goog.require('topology.vars');
+goog.require('topology.patch_math');
+goog.require('topology.vars');
+topology.torus.create = (function create(mnx,mxx,mny,mxy){var min_pxcor19223 = topology.vars.min_pxcor;var max_pxcor19224 = topology.vars.max_pxcor;var min_pycor19225 = topology.vars.min_pycor;var max_pycor19226 = topology.vars.max_pycor;var wrap_in_x_QMARK_19227 = topology.vars.wrap_in_x_QMARK_;var wrap_in_y_QMARK_19228 = topology.vars.wrap_in_y_QMARK_;try{topology.vars.min_pxcor = mnx;
+topology.vars.max_pxcor = mxx;
+topology.vars.min_pycor = mny;
+topology.vars.max_pycor = mxy;
+topology.vars.wrap_in_x_QMARK_ = true;
+topology.vars.wrap_in_y_QMARK_ = true;
+topology.torus.width = (topology.vars.max_pxcor - topology.vars.min_pxcor);
+topology.torus.height = (topology.vars.max_pycor - topology.vars.min_pycor);
+}finally {topology.vars.wrap_in_y_QMARK_ = wrap_in_y_QMARK_19228;
+topology.vars.wrap_in_x_QMARK_ = wrap_in_x_QMARK_19227;
+topology.vars.max_pycor = max_pycor19226;
+topology.vars.min_pycor = min_pycor19225;
+topology.vars.max_pxcor = max_pxcor19224;
+topology.vars.min_pxcor = min_pxcor19223;
+}});
