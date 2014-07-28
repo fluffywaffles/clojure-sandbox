@@ -1,6 +1,6 @@
 (ns topology.torus
-  (:use topology.vars)
-  (:require [topology.core :refer [inheritant-bind]]))
+  (:use [topology.vars :only [min-pxcor min-pxcor max-pxcor max-pycor wrap-in-x? wrap-in-y?]])
+  (:require-macros [topology.core :refer [inheritant-bind]]))
 
 (inheritant-bind
  [ min-pxcor -5

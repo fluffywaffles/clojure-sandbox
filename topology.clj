@@ -1,5 +1,5 @@
 (ns topology.core
-  (:use topology.vars))
+  (:use [topology.vars :only [min-pxcor min-pxcor max-pxcor max-pycor wrap-in-x? wrap-in-y?]]))
 
 ;; hand topology the functions it needs from world
 ;; (I believe all it should need is get-patch-at)
