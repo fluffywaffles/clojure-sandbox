@@ -81,7 +81,8 @@
       (clojure.string/split #"/")
       last))
 
-(defn ^:private _to- [_] (->> (dequalify _)
+(defn ^:private _to- [_] (->> _
+                              str
                               rest
                               (replace {\_ \-})
                               clojure.string/join))
