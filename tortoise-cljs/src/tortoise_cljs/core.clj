@@ -1,5 +1,4 @@
-(ns tortoise-cljs.core
-  (:require topology.patch-math))
+(ns tortoise-cljs.core)
 
 (defn handler [req]
   {:status  200

@@ -10,20 +10,18 @@
                     clojure.string/join))
 
 (defmacro memoizer
-  ([name-gen fun nsp]
+  ([name-gen nsp fun]
      `(def (~name-gen ~fun)
         `(memoize (symbol (str ~~nsp ~~fun)))))
-  ([fun nsp]
+  ([nsp fun]
     (let [ nfn #(symbol (_to- %))]
       `(def ~(nfn fun) (memoize ~(symbol (str nsp "/" fun))))))
   ([fun]
     (let [ nfn #(symbol (_to- %)) ]
       `(def ~(nfn fun) (memoize ~fun)))))
 
-(macroexpand '(memoizer _get_patch_north topology.patch-math))
-
 (defmacro add-patch-math-fn
   ([f]
-   `(def ~f ~(symbol (str "topology.patch-math/" f))))
+   `(def ~f ~(symbol (str "world.topology.patch-math/" f))))
   ([f nm]
-    `(def ~nm ~(symbol (str "topology.patch-math/" f)))))
+    `(def ~nm ~(symbol (str "world.topology.patch-math/" f)))))

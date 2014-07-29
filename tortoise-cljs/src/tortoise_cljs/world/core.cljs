@@ -1,5 +1,5 @@
 (ns world
-  (:require [topology.vars :refer [min-pxcor max-pxcor min-pycor max-pycor _set_bounds!]]
+  (:require [world.topology.vars :refer [min-pxcor max-pxcor min-pycor max-pycor _set_bounds!]]
             [util.etc :refer [js-err]]))
 
 (def _id (gensym "world_"))

@@ -1,7 +1,7 @@
-(ns topology.patch-math
-  (:use [topology.vars :only [min-pxcor min-pycor max-pxcor max-pycor wrap-in-x? wrap-in-y?]])
+(ns world.topology.patch-math
   (:require [util.math :refer [squash]]
-            [world :refer [get-patch-at]])) ;; should refer get-patch-at from world(?)
+            [world :refer [get-patch-at]]
+            [world.topology.vars :refer [min-pxcor min-pycor max-pxcor max-pycor wrap-in-x? wrap-in-y?]])) ;; should refer get-patch-at from world(?)
 
 (defn squash-4 [v mn]
   (squash v mn 1.0E-4))
@@ -62,7 +62,8 @@
 ;; perhaps will not want/need to memoize EVERYTHING,
 ;; but for now just everything.
 
-;; NOTE: the auto memoization macro will not work in CLJS.
+;; NOTE: memoization here is not terribly useful.
+;;       move to topology initialization code.
 
 (def get-patch-north (memoize _get_patch_north))
 (def get-patch-east  (memoize _get_patch_east))

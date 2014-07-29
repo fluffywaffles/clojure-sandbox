@@ -1,4 +1,4 @@
-(ns topology.core
+(ns world.topology.core
   (:require [util.macros :refer [memoizer]]))
 
 ;; hand topology the functions it needs from world
@@ -31,16 +31,18 @@
 (defmacro def-height []
   '(def height (- max-pycor min-pycor)))
 
+(defmacro memo-patch-math [fun] `(memoizer ~'world.topology.patch-math ~fun))
+
 (defmacro inheritant-bind [bind-block & body]
   `(binding ~bind-block
      (def-width)
      (def-height)
-     (memoizer ~'_get_patch_north ~'topology.patch-math)
-     (memoizer ~'_get_patch_east ~'topology.patch-math)
-     (memoizer ~'_get_patch_south ~'topology.patch-math)
-     (memoizer ~'_get_patch_west ~'topology.patch-math)
-     (memoizer ~'_get_patch_northeast ~'topology.patch-math)
-     (memoizer ~'_get_patch_southeast ~'topology.patch-math)
-     (memoizer ~'_get_patch_northwest ~'topology.patch-math)
-     (memoizer ~'_get_patch_southwest ~'topology.patch-math)
+     (memo-patch-math ~'_get_patch_north)
+     (memo-patch-math ~'_get_patch_east)
+     (memo-patch-math ~'_get_patch_south)
+     (memo-patch-math ~'_get_patch_west)
+     (memo-patch-math ~'_get_patch_northeast)
+     (memo-patch-math ~'_get_patch_southeast)
+     (memo-patch-math ~'_get_patch_northwest)
+     (memo-patch-math ~'_get_patch_southwest)
      ~@body))
