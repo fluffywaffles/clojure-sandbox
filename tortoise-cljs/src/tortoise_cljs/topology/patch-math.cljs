@@ -1,12 +1,7 @@
 (ns topology.patch-math
   (:use [topology.vars :only [min-pxcor min-pycor max-pxcor max-pycor wrap-in-x? wrap-in-y?]])
-  (:require [util.math :refer [squash]])) ;; should refer get-patch-at from world(?)
-
-(defn get-patch-at [x y]
-  "stub (and in the wrong place)"
-  (if (and (<= min-pxcor x max-pxcor)
-           (<= min-pycor y max-pycor))
-    {:id -1, :name (str "Patch " x " " y)}))
+  (:require [util.math :refer [squash]]
+            [world :refer [get-patch-at]])) ;; should refer get-patch-at from world(?)
 
 (defn squash-4 [v mn]
   (squash v mn 1.0E-4))
