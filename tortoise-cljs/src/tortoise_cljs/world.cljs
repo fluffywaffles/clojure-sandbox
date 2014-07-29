@@ -1,9 +1,10 @@
 (ns world
-  (:require [topology.vars :refer [min-pxcor max-pxcor min-pycor max-pycor]]))
+  (:require [topology.vars :refer [min-pxcor max-pxcor min-pycor max-pycor _set_bounds!]]
+            [util.etc :refer [js-err]]))
 
 (def _id (gensym "world_"))
 (def ^:dynamic inited? false)
-(def ^:dynamic _topology_generator (:NONE topology.vars/terraformer))
+(def ^:dynamic _topology_generator :NONE)
 (def ^:dynamic _topology_type :NONE)
 
 (def ^:private _size (atom 0))
@@ -17,12 +18,6 @@
 ;; turtleset
 ;; and change those things each "tick" or whatever
 
-(defn ^:private _set_bounds [x1 x2 y1 y2]
-  (set! min-pxcor x1)
-  (set! max-pxcor x2)
-  (set! min-pycor y1)
-  (set! max-pycor y2))
-
 (defn _gen_patchset [mnx mxx mny mxy]
   (with-meta (vec (for [w (range mnx (inc mxx))
                         h (range mny (inc mxy))]
@@ -32,10 +27,13 @@
 (defn init [tt mnx mxx mny mxy]
   (when (not inited?)
     (reset! _size 0)
-    (_set_bounds mnx mxx mny mxy)
-    (set! _topology_type tt) ;; must come before reset! patchset
+    (_set_bounds! mnx mxx mny mxy)
+    (set! _topology_type (keyword (.toUpperCase tt))) ;; must come before reset! patchset
     (reset! patchset (_gen_patchset min-pxcor max-pxcor min-pycor max-pycor))
     (set! inited? true)))
 
 (defn get-patch-at [x y]
-  (nth (drop (* (inc (- max-pycor min-pycor)) (- x min-pxcor)) @patchset) (- y min-pycor)))
+  (if (not inited?)
+    (js-err "World not initialized")
+    (nth (drop (* (inc (- max-pycor min-pycor)) (- x min-pxcor)) @patchset) (- y min-pycor))))
+

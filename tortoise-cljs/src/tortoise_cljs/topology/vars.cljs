@@ -22,6 +22,21 @@
 (def ^:dynamic wrap-in-x? $UNBOUND)
 (def ^:dynamic wrap-in-y? $UNBOUND)
 
-(def terraformer
+(defn bounds []
+  [ min-pxcor
+    max-pxcor
+    min-pycor
+    max-pycor ])
+
+(def topologies
   {:NONE "In the beginning, there was...",
    :TORUS 'topology.torus})
+
+(def terraformer
+  {:TORUS (fn [] topology.torus.create)})
+
+(defn ^:private _set_bounds! [x1 x2 y1 y2]
+  (set! min-pxcor x1)
+  (set! max-pxcor x2)
+  (set! min-pycor y1)
+  (set! max-pycor y2))
