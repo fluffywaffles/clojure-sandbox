@@ -1,4 +1,5 @@
-(ns topology.core)
+(ns topology.core
+  (:require [util.macros :refer [memoizer]]))
 
 ;; hand topology the functions it needs from world
 ;; (I believe all it should need is get-patch-at)
@@ -34,11 +35,12 @@
   `(binding ~bind-block
      (def-width)
      (def-height)
+     (memoizer ~'_get_patch_north ~'topology.patch-math)
+     (memoizer ~'_get_patch_east ~'topology.patch-math)
+     (memoizer ~'_get_patch_south ~'topology.patch-math)
+     (memoizer ~'_get_patch_west ~'topology.patch-math)
+     (memoizer ~'_get_patch_northeast ~'topology.patch-math)
+     (memoizer ~'_get_patch_southeast ~'topology.patch-math)
+     (memoizer ~'_get_patch_northwest ~'topology.patch-math)
+     (memoizer ~'_get_patch_southwest ~'topology.patch-math)
      ~@body))
-
-
-
-
-
-
-
