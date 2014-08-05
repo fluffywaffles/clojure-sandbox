@@ -4,7 +4,6 @@
   :description "tortoise in clojurescript"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2268"]]
-  :ring {:handler tortoise-cljs.core/handler}
   :cljsbuild {
     :repl-listen-port 9000
     :repl-launch-commands
