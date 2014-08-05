@@ -1,0 +1,4 @@
+lein cljsbuild once default
+mkdir ~/Desktop/Tortoise/cross-build
+mv ./target/cljsbuild-compiler-0/**/*.js ~/Desktop/Tortoise/cross-build/
+echo "compiled target transferred"
